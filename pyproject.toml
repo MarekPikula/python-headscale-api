@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "headscale-api"
+version = "0.1.0"
+description = ""
+authors = ["Marek Pikuła <marek@serenitycode.dev>"]
+readme = "README.md"
+packages = [{include = "headscale_api"}]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+mypy = "^1.1.1"
+isort = "^5.11"
+ruff = "^0.0.260"
+pycodestyle = "^2.10.0"
+pydocstyle = "^6.3.0"
+pylint = "^2.13"
+
+[tool.poetry.group.gen.dependencies]
+datamodel-code-generator = "^0.17.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
