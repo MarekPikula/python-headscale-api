@@ -1,0 +1,77 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types:
+      - published
+  schedule:
+    - cron: "0 0 * * 0"
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: poetry install --only main,test --sync
+
+      - name: Test
+        run: |
+            poetry run pytest tests/ --cov=headscale_api --cov-report=term \
+                --cov-report=xml:output/coverage/cov.xml \
+                --cov-report=html:output/coverage/html
+
+      - name: Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "repo_token: ${GITHUB_TOKEN}" > .coveralls.yml
+          poetry run coveralls --service=github
+
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tool:
+          - "black --check --diff"
+          - "pydocstyle"
+          - "pycodestyle"
+          - "pylint"
+          - "ruff"
+          - "mypy"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+      - name: Install dependencies
+        run: poetry install --only main,lint --sync
+      - name: Run formatter
+        run: poetry run ${{ matrix.tool }} src/ tests/
