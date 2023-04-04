@@ -1732,4 +1732,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"  # Change to 3.7 once datetime parsing is fixed.
-content-hash = "36682f20d3082e0f4495edf258f8a0827ff465d17f7fd08ad18bd9c89a965601"
+content-hash = "6590a2c86da77cbca5b8a4add82acfbb385e011afa997b46d1427f99594ea444"
