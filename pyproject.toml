@@ -4,7 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["Marek Pikuła <marek@serenitycode.dev>"]
 readme = "README.md"
-packages = [{include = "headscale_api"}]
+packages = [
+    {include = "headscale_api"},
+    {include = "pixelmatch/py.typed"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"  # Change to 3.7 once datetime parsing is fixed.
