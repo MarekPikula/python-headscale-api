@@ -74,4 +74,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --only main,lint --sync
       - name: Run formatter
-        run: poetry run ${{ matrix.tool }} src/ tests/
+        run: poetry run ${{ matrix.tool }} headscale_api/ tests/
