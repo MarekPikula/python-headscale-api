@@ -7,14 +7,15 @@
 		"ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {},
 		"ghcr.io/devcontainers-contrib/features/poetry:2": {
 			"version": "latest"
-		}
+		},
+		"ghcr.io/devcontainers/features/go:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "sudo apt-get update && sudo apt install -y protobuf-compiler",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -23,9 +24,11 @@
 				"bungcip.better-toml",
 				"github.vscode-github-actions",
 				"GitHub.vscode-pull-request-github",
+				"golang.go",
 				"mhutchie.git-graph",
 				"ms-azuretools.vscode-docker",
 				"njpwerner.autodocstring",
+				"pbkit.vscode-pbkit",
 				"redhat.vscode-yaml"
 			],
 			"settings": {
