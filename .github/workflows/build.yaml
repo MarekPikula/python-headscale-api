@@ -58,7 +58,7 @@ jobs:
           cache: "poetry"
 
       - name: Install dependencies
-        run: poetry install --only main,test --sync
+        run: poetry install --only main,test
 
       - name: Test
         run: |
@@ -94,7 +94,7 @@ jobs:
           python-version: "3.11"
           cache: "poetry"
       - name: Install dependencies
-        run: poetry install --only main,lint --sync
+        run: poetry install --only main,lint
       - name: Run formatter
         run: poetry run ${{ matrix.tool }} headscale_api/ tests/
 
