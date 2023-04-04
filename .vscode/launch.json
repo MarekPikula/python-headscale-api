@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Headscale API",
+            "type": "python",
+            "request": "launch",
+            "module": "headscale_api.__init__",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "HEADSCALE_APIURL": "CHANGEME",
+                "HEADSCALE_APIKEY": "CHANGEME",
+            }
+        },
+    ]
+}
