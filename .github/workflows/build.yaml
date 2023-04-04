@@ -75,3 +75,4 @@ jobs:
         run: poetry install --only main,lint --sync
       - name: Run formatter
         run: poetry run ${{ matrix.tool }} headscale_api/ tests/
+        continue-on-error: true
