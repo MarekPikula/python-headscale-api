@@ -1160,6 +1160,7 @@ files = [
 deprecated = ">=1.2.5,<1.3.0"
 importlib-metadata = "*"
 pydantic = ">=1.8,<2"
+"ruamel.yaml" = {version = ">=0.15,<0.18", optional = true, markers = "extra == \"ruamel\""}
 types-Deprecated = "*"
 
 [package.extras]
@@ -1427,7 +1428,7 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 name = "ruamel-yaml"
 version = "0.17.21"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3"
 files = [
@@ -1731,4 +1732,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"  # Change to 3.7 once datetime parsing is fixed.
-content-hash = "9a9b4b38181d5463ba6ce27d12893aaf2236bf3a22e2449eebbb12da08ca2dd5"
+content-hash = "36682f20d3082e0f4495edf258f8a0827ff465d17f7fd08ad18bd9c89a965601"
