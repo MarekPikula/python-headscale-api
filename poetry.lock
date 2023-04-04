@@ -39,7 +39,7 @@ tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy
 name = "betterproto"
 version = "1.2.5"
 description = "A better Protobuf / gRPC generator & library"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -60,7 +60,7 @@ compiler = ["black", "jinja2", "protobuf"]
 name = "black"
 version = "23.3.0"
 description = "The uncompromising code formatter."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -205,7 +205,7 @@ files = [
 name = "click"
 version = "8.1.3"
 description = "Composable command line interface toolkit"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -220,7 +220,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 files = [
@@ -341,7 +341,7 @@ files = [
 name = "grpclib"
 version = "0.4.3"
 description = "Pure-Python gRPC implementation for asyncio"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -359,7 +359,7 @@ protobuf = ["protobuf (>=3.15.0)"]
 name = "h2"
 version = "4.1.0"
 description = "HTTP/2 State-Machine based protocol implementation"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.1"
 files = [
@@ -375,7 +375,7 @@ hyperframe = ">=6.0,<7"
 name = "hpack"
 version = "4.0.0"
 description = "Pure-Python HPACK header compression"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.1"
 files = [
@@ -387,7 +387,7 @@ files = [
 name = "hyperframe"
 version = "6.0.1"
 description = "HTTP/2 framing layer for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.1"
 files = [
@@ -441,7 +441,7 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 name = "jinja2"
 version = "3.1.2"
 description = "A very fast and expressive template engine."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -505,7 +505,7 @@ files = [
 name = "markupsafe"
 version = "2.1.2"
 description = "Safely add untrusted strings to HTML/XML markup."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -577,7 +577,7 @@ files = [
 name = "multidict"
 version = "6.0.4"
 description = "multidict implementation"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -707,7 +707,7 @@ reports = ["lxml"]
 name = "mypy-extensions"
 version = "1.0.0"
 description = "Type system extensions for programs checked with the mypy type checker."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 files = [
@@ -719,7 +719,7 @@ files = [
 name = "packaging"
 version = "23.0"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -731,7 +731,7 @@ files = [
 name = "pathspec"
 version = "0.11.1"
 description = "Utility library for gitignore style pattern matching of file paths."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -743,7 +743,7 @@ files = [
 name = "platformdirs"
 version = "3.2.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -775,7 +775,7 @@ testing = ["pytest", "pytest-benchmark"]
 name = "protobuf"
 version = "4.22.1"
 description = ""
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -792,18 +792,6 @@ files = [
     {file = "protobuf-4.22.1-cp39-cp39-win_amd64.whl", hash = "sha256:b8700792f88e59ccecfa246fa48f689d6eee6900eddd486cdae908ff706c482b"},
     {file = "protobuf-4.22.1-py3-none-any.whl", hash = "sha256:3e19dcf4adbf608924d3486ece469dd4f4f2cf7d2649900f0efcd1a84e8fd3ba"},
     {file = "protobuf-4.22.1.tar.gz", hash = "sha256:dce7a55d501c31ecf688adb2f6c3f763cf11bc0be815d1946a84d74772ab07a7"},
-]
-
-[[package]]
-name = "pycodestyle"
-version = "2.10.0"
-description = "Python style guide checker"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "pycodestyle-2.10.0-py2.py3-none-any.whl", hash = "sha256:8a4eaf0d0495c7395bdab3589ac2db602797d76207242c17d470186815706610"},
-    {file = "pycodestyle-2.10.0.tar.gz", hash = "sha256:347187bdb476329d98f695c213d7295a846d1152ff4fe9bacb8a9590b8ee7053"},
 ]
 
 [[package]]
@@ -970,7 +958,7 @@ files = [
 name = "stringcase"
 version = "1.2.0"
 description = "String case converter."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -1133,4 +1121,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"  # Change to 3.7 once datetime parsing is fixed.
-content-hash = "e2e8551cc2164e0ffc91c4ba233452da64a100ea87d20f6becae4e87764f2f80"
+content-hash = "5787952e186d0bed2582d74ca8e2f01a2842e14d208ac5910ea111bbcb368991"

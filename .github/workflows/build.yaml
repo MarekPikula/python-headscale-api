@@ -77,8 +77,8 @@ jobs:
       matrix:
         tool:
           - "black --check --diff"
+          - "isort --check --diff"
           - "pydocstyle"
-          - "pycodestyle"
           - "pylint"
           - "ruff"
           - "mypy"

@@ -26,6 +26,7 @@
 		"vscode": {
 			"extensions": [
 				"bungcip.better-toml",
+				"charliermarsh.ruff",
 				"github.vscode-github-actions",
 				"GitHub.vscode-pull-request-github",
 				"golang.go",
