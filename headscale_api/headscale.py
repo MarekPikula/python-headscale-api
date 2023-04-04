@@ -60,6 +60,13 @@ class Headscale(model.HeadscaleServiceStub):
             logging.basicConfig(level=logger)
             self._logger = logging.getLogger(__name__)
 
+    async def test_api_key(self):
+        try:
+            await self.list_api_keys()
+        except ErrorResponse:
+            return False
+        return True
+
     async def _unary_unary(
         self,
         route: str,

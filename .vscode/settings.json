@@ -1,0 +1,11 @@
+{
+    "python.testing.pytestArgs": [
+        "tests",
+        "--cov=headscale_api",
+        "--cov-report=term",
+        "--cov-report=xml:output/coverage/cov.xml",
+        "--cov-report=html:output/coverage/html"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

@@ -109,9 +109,9 @@ derp:
   # their own DERP servers:
   # https://tailscale.com/kb/1118/custom-derp-servers/
   #
-  # paths:
-  #   - /etc/headscale/derp-example.yaml
-  paths: []
+  paths:
+    - /etc/headscale/derp-example.yaml
+  # paths: []
 
   # If enabled, a worker will be set up to periodically
   # refresh the given sources and update the derpmap
@@ -143,15 +143,15 @@ db_path: ./db.sqlite
 # # Postgres config
 # If using a Unix socket to connect to Postgres, set the socket path in the 'host' field and leave 'port' blank.
 # db_type: postgres
-# db_host: localhost
-# db_port: 5432
-# db_name: headscale
-# db_user: foo
-# db_pass: bar
+db_host: localhost
+db_port: 5432
+db_name: headscale
+db_user: foo
+db_pass: bar
 
 # If other 'sslmode' is required instead of 'require(true)' and 'disabled(false)', set the 'sslmode' you need
 # in the 'db_ssl' field. Refers to https://www.postgresql.org/docs/current/libpq-ssl.html Table 34.1.
-# db_ssl: false
+db_ssl: false
 
 ### TLS configuration
 #
@@ -238,18 +238,19 @@ dns_config:
   #     - 8.8.8.8
 
   # Search domains to inject.
-  domains: []
+  domains:
+    - ""
 
   # Extra DNS records
   # so far only A-records are supported (on the tailscale side)
   # See https://github.com/juanfont/headscale/blob/main/docs/dns-records.md#Limitations
-  # extra_records:
-  #   - name: "grafana.myvpn.example.com"
-  #     type: "A"
-  #     value: "100.64.0.3"
+  extra_records:
+    - name: "grafana.myvpn.example.com"
+      type: "A"
+      value: "100.64.0.3"
   #
   #   # you can also put it in one line
-  #   - { name: "prometheus.myvpn.example.com", type: "A", value: "100.64.0.3" }
+    - { name: "prometheus.myvpn.example.com", type: "A", value: "100.64.0.3" }
 
   # Whether to use [MagicDNS](https://tailscale.com/kb/1081/magicdns/).
   # Only works if there is at least a nameserver defined.
@@ -271,52 +272,52 @@ unix_socket_permission: "0770"
 # it is still being tested and might have some bugs, please
 # help us test it.
 # OpenID Connect
-# oidc:
-#   only_start_if_oidc_is_available: true
-#   issuer: "https://your-oidc.issuer.com/path"
-#   client_id: "your-oidc-client-id"
-#   client_secret: "your-oidc-client-secret"
-#   # Alternatively, set `client_secret_path` to read the secret from the file.
-#   # It resolves environment variables, making integration to systemd's
-#   # `LoadCredential` straightforward:
-#   client_secret_path: "${CREDENTIALS_DIRECTORY}/oidc_client_secret"
-#   # client_secret and client_secret_path are mutually exclusive.
-#
-#   # The amount of time from a node is authenticated with OpenID until it
-#   # expires and needs to reauthenticate.
-#   # Setting the value to "0" will mean no expiry.
-#   expiry: 180d
-#
-#   # Use the expiry from the token received from OpenID when the user logged
-#   # in, this will typically lead to frequent need to reauthenticate and should
-#   # only been enabled if you know what you are doing.
-#   # Note: enabling this will cause `oidc.expiry` to be ignored.
-#   use_expiry_from_token: false
-#
-#   # Customize the scopes used in the OIDC flow, defaults to "openid", "profile" and "email" and add custom query
-#   # parameters to the Authorize Endpoint request. Scopes default to "openid", "profile" and "email".
-#
-#   scope: ["openid", "profile", "email", "custom"]
-#   extra_params:
-#     domain_hint: example.com
-#
-#   # List allowed principal domains and/or users. If an authenticated user's domain is not in this list, the
-#   # authentication request will be rejected.
-#
-#   allowed_domains:
-#     - example.com
-#   # Note: Groups from keycloak have a leading '/'
-#   allowed_groups:
-#     - /headscale
-#   allowed_users:
-#     - alice@example.com
-#
-#   # If `strip_email_domain` is set to `true`, the domain part of the username email address will be removed.
-#   # This will transform `first-name.last-name@example.com` to the user `first-name.last-name`
-#   # If `strip_email_domain` is set to `false` the domain part will NOT be removed resulting to the following
-#   user: `first-name.last-name.example.com`
-#
-#   strip_email_domain: true
+oidc:
+  only_start_if_oidc_is_available: true
+  issuer: "https://your-oidc.issuer.com/path"
+  client_id: "your-oidc-client-id"
+  client_secret: "your-oidc-client-secret"
+  # Alternatively, set `client_secret_path` to read the secret from the file.
+  # It resolves environment variables, making integration to systemd's
+  # `LoadCredential` straightforward:
+  client_secret_path: "${CREDENTIALS_DIRECTORY}/oidc_client_secret"
+  # client_secret and client_secret_path are mutually exclusive.
+
+  # The amount of time from a node is authenticated with OpenID until it
+  # expires and needs to reauthenticate.
+  # Setting the value to "0" will mean no expiry.
+  expiry: 180d
+
+  # Use the expiry from the token received from OpenID when the user logged
+  # in, this will typically lead to frequent need to reauthenticate and should
+  # only been enabled if you know what you are doing.
+  # Note: enabling this will cause `oidc.expiry` to be ignored.
+  use_expiry_from_token: false
+
+  # Customize the scopes used in the OIDC flow, defaults to "openid", "profile" and "email" and add custom query
+  # parameters to the Authorize Endpoint request. Scopes default to "openid", "profile" and "email".
+
+  scope: ["openid", "profile", "email", "custom"]
+  extra_params:
+    domain_hint: example.com
+
+  # List allowed principal domains and/or users. If an authenticated user's domain is not in this list, the
+  # authentication request will be rejected.
+
+  allowed_domains:
+    - example.com
+  # Note: Groups from keycloak have a leading '/'
+  allowed_groups:
+    - /headscale
+  allowed_users:
+    - alice@example.com
+
+  # If `strip_email_domain` is set to `true`, the domain part of the username email address will be removed.
+  # This will transform `first-name.last-name@example.com` to the user `first-name.last-name`
+  # If `strip_email_domain` is set to `false` the domain part will NOT be removed resulting to the following
+  user: "first-name.last-name.example.com"
+
+  strip_email_domain: true
 
 # Logtail configuration
 # Logtail is Tailscales logging and auditing infrastructure, it allows the control panel
