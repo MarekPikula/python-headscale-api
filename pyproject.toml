@@ -1,12 +1,20 @@
 [tool.poetry]
 name = "headscale-api"
 version = "0.1.0"
-description = ""
+description = "Python Headscale API and configuration abstraction."
 authors = ["Marek Pikuła <marek@serenitycode.dev>"]
+maintainers = ["Marek Pikuła <marek@serenitycode.dev>"]
+license = "MIT"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+]
+repository = "https://github.com/MarekPikula/python-headscale-api"
+# documentation = "https://python-headscale-api.readthedocs.io"
 readme = "README.md"
 packages = [
     {include = "headscale_api"},
-    {include = "pixelmatch/py.typed"},
 ]
 
 [tool.poetry.dependencies]
