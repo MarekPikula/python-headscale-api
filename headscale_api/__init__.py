@@ -1,5 +1,6 @@
 """Headscale API module."""
 
+from .config import HeadscaleConfig  # type: ignore
 from .headscale import Headscale
 
 if __name__ == "__main__":

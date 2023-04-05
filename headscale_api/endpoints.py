@@ -2,8 +2,8 @@
 
 __authors__ = ["Marek Pikuła <marek@serenitycode.dev>"]
 
-from dataclasses import dataclass, fields
-from typing import Generic, Literal, Optional, Type, TypeVar
+from dataclasses import dataclass
+from typing import Any, Dict, Generic, Literal, Optional, Type, TypeVar
 
 from betterproto import Message
 
@@ -84,12 +84,12 @@ class Endpoint(Generic[RequestT, ResponseT]):
         Raises:
             KeyError: if unsupported key is detected in the message.
         """
-
-        def dict_from_schema(msg: Message):
-            return {field.name: None for field in fields(msg)}  # type: ignore
-
-        request_dict = dict_from_schema(self.request_schema())
-        response_dict = dict_from_schema(self.response_schema())
+        request_dict: Dict[str, Any] = self.request_schema().to_dict(  # type: ignore
+            include_default_values=True
+        )
+        response_dict: Dict[str, Any] = self.response_schema().to_dict(  # type: ignore
+            include_default_values=True
+        )
 
         self.api_url.format_map(request_dict)
         self.logger_start_message.format_map(request_dict)
@@ -121,8 +121,8 @@ ENDPOINTS = {
         schema.RenameUserRequest,
         schema.RegisterMachineResponse,
         "POST",
-        "/api/v1/user/{old_name}/rename/{new_name}",
-        'Renaming user from "{old_name} to "{new_name}".',
+        "/api/v1/user/{oldName}/rename/{newName}",
+        'Renaming user from "{oldName} to "{newName}".',
     ),
     "/headscale.v1.HeadscaleService/DeleteUser": Endpoint(
         schema.DeleteUserRequest,
@@ -172,15 +172,15 @@ ENDPOINTS = {
         schema.GetMachineRequest,
         schema.GetMachineResponse,
         "GET",
-        "/api/v1/machine/{machine_id}",
-        'Getting machine "{machine_id}".',
+        "/api/v1/machine/{machineId}",
+        'Getting machine "{machineId}".',
     ),
     "/headscale.v1.HeadscaleService/SetTags": Endpoint(
         schema.SetTagsRequest,
         schema.SetTagsResponse,
         "POST",
-        "/api/v1/machine/{machine_id}/tags",
-        'Setting tags for machine "{machine_id}".',
+        "/api/v1/machine/{machineId}/tags",
+        'Setting tags for machine "{machineId}".',
     ),
     "/headscale.v1.HeadscaleService/RegisterMachine": Endpoint(
         schema.RegisterMachineRequest,
@@ -193,22 +193,22 @@ ENDPOINTS = {
         schema.DeleteMachineRequest,
         schema.DeleteDeviceResponse,
         "DELETE",
-        "/api/v1/machine/{machine_id}",
-        'Deleting machine "{machine_id}".',
+        "/api/v1/machine/{machineId}",
+        'Deleting machine "{machineId}".',
     ),
     "/headscale.v1.HeadscaleService/ExpireMachine": Endpoint(
         schema.ExpireMachineRequest,
         schema.ExpireMachineResponse,
         "POST",
-        "/api/v1/machine/{machine_id}/expire",
-        'Expiring machine "{machine_id}".',
+        "/api/v1/machine/{machineId}/expire",
+        'Expiring machine "{machineId}".',
     ),
     "/headscale.v1.HeadscaleService/RenameMachine": Endpoint(
         schema.RenameMachineRequest,
         schema.RenameMachineResponse,
         "POST",
-        "/api/v1/machine/{machine_id}/rename/{new_name}",
-        'Renaming machine "{machine_id}" to "{new_name}".',
+        "/api/v1/machine/{machineId}/rename/{newName}",
+        'Renaming machine "{machineId}" to "{newName}".',
     ),
     "/headscale.v1.HeadscaleService/ListMachines": Endpoint(
         schema.ListMachinesRequest,
@@ -221,8 +221,8 @@ ENDPOINTS = {
         schema.MoveMachineRequest,
         schema.MoveMachineResponse,
         "POST",
-        "/api/v1/machine/{machine_id}/user",
-        'Moving machine "{machine_id}" to user "{user}".',
+        "/api/v1/machine/{machineId}/user",
+        'Moving machine "{machineId}" to user "{user}".',
     ),
     "/headscale.v1.HeadscaleService/GetRoutes": Endpoint(
         schema.GetRoutesRequest,
@@ -235,29 +235,29 @@ ENDPOINTS = {
         schema.EnableRouteRequest,
         schema.EnableRouteResponse,
         "POST",
-        "/api/v1/routes/{route_id}/enable",
-        'Enabling route "{route_id}".',
+        "/api/v1/routes/{routeId}/enable",
+        'Enabling route "{routeId}".',
     ),
     "/headscale.v1.HeadscaleService/DisableRoute": Endpoint(
         schema.DisableRouteRequest,
         schema.DisableRouteResponse,
         "POST",
-        "/api/v1/routes/{route_id}/enable",
-        'Disabling route "{route_id}".',
+        "/api/v1/routes/{routeId}/enable",
+        'Disabling route "{routeId}".',
     ),
     "/headscale.v1.HeadscaleService/GetMachineRoutes": Endpoint(
         schema.GetMachineRoutesRequest,
         schema.GetMachineRoutesResponse,
         "GET",
-        "/api/v1/machine/{machine_id}/routes",
-        'Getting routes for machine "{machine_id}".',
+        "/api/v1/machine/{machineId}/routes",
+        'Getting routes for machine "{machineId}".',
     ),
     "/headscale.v1.HeadscaleService/DeleteRoute": Endpoint(
         schema.DeleteRouteRequest,
         schema.DeleteRouteResponse,
         "DELETE",
-        "/api/v1/routes/{route_id}",
-        'Deleting route "{route_id}".',
+        "/api/v1/routes/{routeId}",
+        'Deleting route "{routeId}".',
     ),
     # API key API.
     "/headscale.v1.HeadscaleService/CreateApiKey": Endpoint(

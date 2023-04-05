@@ -10,7 +10,7 @@ class HeadscaleConfig(YamlModelMixin, ConfigModel):
 
     Can be loaded, e.g., from file with `parse_file()` or from string with
     `parse_raw()`. for more details look at pydantic_yaml documentation
-    W(https://pydantic-yaml.readthedocs.io/en/latest/).
+    (https://pydantic-yaml.readthedocs.io/en/latest/).
     """
 
     server_url: str
