@@ -1,7 +1,7 @@
 """Headscale API module."""
 
-from .config import HeadscaleConfig  # type: ignore
-from .headscale import Headscale
+from .config import HeadscaleConfig  # noqa # type: ignore
+from .headscale import Headscale  # noqa
 
 if __name__ == "__main__":
     import asyncio
