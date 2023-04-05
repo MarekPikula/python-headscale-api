@@ -72,12 +72,26 @@ class Headscale(model.HeadscaleServiceStub):
     def api_key(self, new_api_key: str):
         self._api_key = new_api_key
 
-    async def test_api_key(self):
-        try:
-            await self.list_api_keys()
-        except ErrorResponse:
-            return False
-        return True
+    async def test_api_key(self, new_api_key: Optional[str] = None) -> bool:
+        """Test a (new) API key.
+
+        Keyword Arguments:
+            new_api_key -- new API key, if None, test the current one (default: {None})
+
+        Returns:
+            True if the API key is authorized.
+        """
+        if new_api_key is None:
+            new_api_key = self.api_key
+        response = requests.get(
+            f"{self._base_url}/api/v1/apikey",
+            headers={
+                "Accept": "application/json",
+                "Authorization": f"Bearer {new_api_key}",
+            },
+            timeout=self.timeout,
+        )
+        return response.status_code == 200
 
     async def _unary_unary(
         self,
