@@ -98,31 +98,31 @@ jobs:
       - name: Run formatter
         run: poetry run ${{ matrix.tool }} headscale_api/ tests/
 
-  build-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Poetry
-        run: pipx install poetry
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "poetry"
-      - name: Install dependencies
-        run: poetry install --only main,doc
-      - name: Build docs
-        run: poetry run make -C docs/ html
-      - name: Upload the built documentation
-        uses: actions/upload-artifact@v3
-        with:
-          name: documentation
-          path: docs/_build/
+  # build-docs:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Install Poetry
+  #       run: pipx install poetry
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.11"
+  #         cache: "poetry"
+  #     - name: Install dependencies
+  #       run: poetry install --only main,doc
+  #     - name: Build docs
+  #       run: poetry run make -C docs/ html
+  #     - name: Upload the built documentation
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: documentation
+  #         path: docs/_build/
 
   build-publish:
     needs:
       - test
-      - build-docs
+      # - build-docs
       - lint
     if: github.ref == 'refs/heads/main'
     name: Build source distribution
