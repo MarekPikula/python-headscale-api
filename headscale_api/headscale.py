@@ -52,13 +52,25 @@ class Headscale(model.HeadscaleServiceStub):
                 (default: {logging.INFO})
         """
         self._base_url = base_url
-        self.api_key = api_key
+        self._api_key = api_key
         self.timeout = requests_timeout
         if isinstance(logger, logging.Logger):
             self._logger = logger
         else:
             logging.basicConfig(level=logger)
             self._logger = logging.getLogger(__name__)
+
+    @property
+    def api_key(self) -> Optional[str]:
+        """Get API key if saved.
+
+        Can be overriden in child class.
+        """
+        return self._api_key
+
+    @api_key.setter
+    def api_key(self, new_api_key: str):
+        self._api_key = new_api_key
 
     async def test_api_key(self):
         try:
