@@ -94,6 +94,23 @@ class Headscale(model.HeadscaleServiceStub):
         )
         return response.status_code == 200
 
+    @property
+    def base_url(self):
+        """Get base URL of the Headscale server."""
+        return self._base_url
+
+    @property
+    def health_url(self) -> str:
+        """Get health check URL of the Headscale server."""
+        return f"{self.base_url}/health"
+
+    async def health_check(self) -> bool:
+        """Perform a health check.
+
+        Returns True if check passed.
+        """
+        return requests.get(self.health_url, timeout=self.timeout).status_code == 200
+
     def _safe_snake_case_recursive(
         self, dictionary: Dict[Any, Any]
     ) -> Generator[Tuple[Any, Any], None, None]:
