@@ -5,7 +5,9 @@ OUTPUT_PATH=headscale_api/schema
 
 PROTO_PATH=${HEADSCALE_PATH}/proto/
 protoc --proto_path=${PROTO_PATH} --proto_path=external/googleapis/ \
-    --python_betterproto_out=${OUTPUT_PATH} $(find ${PROTO_PATH} -name "*.proto")
+    --python_betterproto_out=${OUTPUT_PATH} \
+    --python_betterproto_opt=pydantic_dataclasses \
+    $(find ${PROTO_PATH} -name "*.proto")
 
 # TODO: Compare external config example.
 CONFIG_PATH=${HEADSCALE_PATH}/../config-example.yaml

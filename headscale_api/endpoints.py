@@ -3,9 +3,10 @@
 __authors__ = ["Marek Pikuła <marek@serenitycode.dev>"]
 
 from dataclasses import dataclass
-from typing import Any, Dict, Generic, Literal, Optional, Type, TypeVar
+from typing import Generic, Literal, Optional, Type, TypeVar
 
-from betterproto import Message
+from betterproto import Message, ProtoClassMetadata
+from betterproto.casing import camel_case
 
 from .schema.headscale import v1 as schema
 
@@ -84,12 +85,17 @@ class Endpoint(Generic[RequestT, ResponseT]):
         Raises:
             KeyError: if unsupported key is detected in the message.
         """
-        request_dict: Dict[str, Any] = self.request_schema().to_dict(  # type: ignore
-            include_default_values=True
-        )
-        response_dict: Dict[str, Any] = self.response_schema().to_dict(  # type: ignore
-            include_default_values=True
-        )
+
+        def schema_to_dict(schema_class: Type[Message]):
+            return {
+                camel_case(field_name).rstrip("_"): ""
+                for field_name, _ in ProtoClassMetadata(
+                    schema_class
+                ).meta_by_field_name.items()
+            }
+
+        request_dict = schema_to_dict(self.request_schema)
+        response_dict = schema_to_dict(self.response_schema)
 
         self.api_url.format_map(request_dict)
         self.logger_start_message.format_map(request_dict)

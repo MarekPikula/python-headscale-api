@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "headscale-api"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python Headscale API and configuration abstraction."
 authors = ["Marek Pikuła <marek@serenitycode.dev>"]
 maintainers = ["Marek Pikuła <marek@serenitycode.dev>"]
@@ -18,8 +18,8 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"  # Change to 3.7 once datetime parsing is fixed.
-betterproto = {extras = ["compiler"], version = "^1.2.5"}
+python = "^3.11"  # TODO: Change to 3.7 once datetime parsing is fixed.
+betterproto = {version = "2.0.0b5", extras = ["compiler"]} # TODO: Change after release.
 requests = "^2.28.2"
 pydantic = "^1.10.7"
 pydantic-yaml = {extras = ["ruamel"], version = "^0.11.2"}
@@ -50,6 +50,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
+skip_glob = ["headscale_api/schema"]
 
 [tool.pydocstyle]
 match_dir = '^(?:(headscale_api\/schema)|(\.)).*$'
@@ -59,3 +60,6 @@ ignore-paths = ["headscale_api/schema"]
 
 [tool.ruff]
 exclude = ["headscale_api/schema"]
+
+[tool.mypy]
+exclude = ['^headscale_api\/schema\/.*$']

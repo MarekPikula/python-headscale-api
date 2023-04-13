@@ -12,5 +12,3 @@ class HeadscaleConfig(YamlModelMixin, ConfigModel):
     `parse_raw()`. for more details look at pydantic_yaml documentation
     (https://pydantic-yaml.readthedocs.io/en/latest/).
     """
-
-    server_url: str

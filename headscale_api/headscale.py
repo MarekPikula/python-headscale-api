@@ -5,10 +5,11 @@ __authors__ = ["Marek Pikuła <marek@serenitycode.dev>"]
 import logging
 from dataclasses import dataclass
 from json import JSONDecodeError
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Generator, List, Optional, Tuple, Type, TypeVar, Union
 
 import requests
 from betterproto import Message
+from betterproto.casing import safe_snake_case
 
 from .endpoints import ENDPOINTS, Endpoint
 from .schema.headscale import v1 as model
@@ -93,7 +94,19 @@ class Headscale(model.HeadscaleServiceStub):
         )
         return response.status_code == 200
 
-    async def _unary_unary(
+    def _safe_snake_case_recursive(
+        self, dictionary: Dict[Any, Any]
+    ) -> Generator[Tuple[Any, Any], None, None]:
+        assert isinstance(dictionary, dict)
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                yield key, dict(self._safe_snake_case_recursive(value))  # type: ignore
+            elif isinstance(key, str):
+                yield safe_snake_case(key), value
+            else:
+                yield key, value
+
+    async def _unary_unary(  # type: ignore
         self,
         route: str,
         request: Message,
@@ -127,7 +140,7 @@ class Headscale(model.HeadscaleServiceStub):
                 "Accept": "application/json",
                 "Authorization": f"Bearer {self.api_key}",
             },
-            timeout=self.timeout,
+            timeout=self.timeout if timeout is None else timeout,
         )
 
         def error_message():
@@ -149,9 +162,8 @@ class Headscale(model.HeadscaleServiceStub):
                 ) from error
 
         try:
-            response_dict = response.json()
-            assert isinstance(response_dict, dict)
-            response_parsed = response_type().from_dict(response_dict)  # type: ignore
+            response_dict = dict(self._safe_snake_case_recursive(response.json()))
+            response_parsed = response_type(**response_dict)  # type: ignore
         except (JSONDecodeError, AssertionError, ValueError) as error:
             raise ErrorResponse(response.status_code, error_message(), []) from error
 
