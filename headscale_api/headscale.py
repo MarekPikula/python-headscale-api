@@ -112,16 +112,27 @@ class Headscale(model.HeadscaleServiceStub):
         return requests.get(self.health_url, timeout=self.timeout).status_code == 200
 
     def _safe_snake_case_recursive(
-        self, dictionary: Dict[Any, Any]
-    ) -> Generator[Tuple[Any, Any], None, None]:
+        self, dictionary: Dict[str, Any]
+    ) -> Generator[Tuple[str, Any], None, None]:
         assert isinstance(dictionary, dict)
         for key, value in dictionary.items():
+            escaped_key = safe_snake_case(key)
             if isinstance(value, dict):
-                yield key, dict(self._safe_snake_case_recursive(value))  # type: ignore
-            elif isinstance(key, str):
-                yield safe_snake_case(key), value
+                yield (
+                    escaped_key,
+                    dict(self._safe_snake_case_recursive(value)),  # type: ignore
+                )
+            elif isinstance(value, list):
+                yield escaped_key, list(
+                    list_value
+                    if not isinstance(list_value, dict)
+                    else dict(
+                        self._safe_snake_case_recursive(list_value)  # type: ignore
+                    )
+                    for list_value in value  # type: ignore
+                )
             else:
-                yield key, value
+                yield escaped_key, value
 
     async def _unary_unary(  # type: ignore
         self,

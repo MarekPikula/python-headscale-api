@@ -40,7 +40,7 @@ class ApiKey(betterproto.Message):
     prefix: str = betterproto.string_field(2)
     expiration: datetime = betterproto.message_field(3)
     created_at: datetime = betterproto.message_field(4)
-    last_seen: datetime = betterproto.message_field(5)
+    last_seen: Optional[datetime] = betterproto.message_field(5)
 
 
 @dataclass(eq=False, repr=False)
