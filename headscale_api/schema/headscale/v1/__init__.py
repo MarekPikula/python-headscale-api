@@ -6,7 +6,10 @@
 from typing import TYPE_CHECKING
 
 
-from pydantic.dataclasses import dataclass
+if TYPE_CHECKING:
+    from dataclasses import dataclass
+else:
+    from pydantic.dataclasses import dataclass
 
 from datetime import datetime
 from typing import (
@@ -19,6 +22,7 @@ from typing import (
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+from pydantic import root_validator
 
 
 if TYPE_CHECKING:
@@ -40,7 +44,13 @@ class ApiKey(betterproto.Message):
     prefix: str = betterproto.string_field(2)
     expiration: datetime = betterproto.message_field(3)
     created_at: datetime = betterproto.message_field(4)
-    last_seen: Optional[datetime] = betterproto.message_field(5)
+    last_seen: Optional[datetime] = betterproto.message_field(
+        5, optional=True, group="_last_seen"
+    )
+
+    @root_validator()
+    def check_oneof(cls, values):
+        return cls._validate_field_groups(values)
 
 
 @dataclass(eq=False, repr=False)
@@ -280,7 +290,9 @@ class Machine(betterproto.Message):
     last_seen: datetime = betterproto.message_field(8)
     last_successful_update: datetime = betterproto.message_field(9)
     expiry: datetime = betterproto.message_field(10)
-    pre_auth_key: "PreAuthKey" = betterproto.message_field(11)
+    pre_auth_key: Optional["PreAuthKey"] = betterproto.message_field(
+        11, optional=True, group="_pre_auth_key"
+    )
     created_at: datetime = betterproto.message_field(12)
     register_method: "RegisterMethod" = betterproto.enum_field(13)
     forced_tags: List[str] = betterproto.string_field(18)
@@ -288,6 +300,10 @@ class Machine(betterproto.Message):
     valid_tags: List[str] = betterproto.string_field(20)
     given_name: str = betterproto.string_field(21)
     online: bool = betterproto.bool_field(22)
+
+    @root_validator()
+    def check_oneof(cls, values):
+        return cls._validate_field_groups(values)
 
 
 @dataclass(eq=False, repr=False)
@@ -397,7 +413,13 @@ class Route(betterproto.Message):
     is_primary: bool = betterproto.bool_field(6)
     created_at: datetime = betterproto.message_field(7)
     updated_at: datetime = betterproto.message_field(8)
-    deleted_at: datetime = betterproto.message_field(9)
+    deleted_at: Optional[datetime] = betterproto.message_field(
+        9, optional=True, group="_deleted_at"
+    )
+
+    @root_validator()
+    def check_oneof(cls, values):
+        return cls._validate_field_groups(values)
 
 
 @dataclass(eq=False, repr=False)

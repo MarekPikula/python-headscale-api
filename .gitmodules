@@ -1,6 +1,6 @@
 [submodule "external/headscale"]
 	path = external/headscale
-	url = https://github.com/juanfont/headscale.git
+	url = https://github.com/MarekPikula/headscale.git
 [submodule "external/googleapis"]
 	path = external/googleapis
 	url = https://github.com/googleapis/googleapis.git
