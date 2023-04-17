@@ -5,6 +5,7 @@ OUTPUT_PATH=headscale_api/schema
 
 PROTO_PATH=${HEADSCALE_PATH}/proto/
 protoc --proto_path=${PROTO_PATH} --proto_path=external/googleapis/ \
+    --experimental_allow_proto3_optional \
     --python_betterproto_out=${OUTPUT_PATH} \
     --python_betterproto_opt=pydantic_dataclasses \
     $(find ${PROTO_PATH} -name "*.proto")
