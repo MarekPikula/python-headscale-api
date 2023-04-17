@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "headscale-api"
-version = "0.1.3"
+version = "0.1.4"
 description = "Python Headscale API and configuration abstraction."
 authors = ["Marek Pikuła <marek@serenitycode.dev>"]
 maintainers = ["Marek Pikuła <marek@serenitycode.dev>"]
@@ -43,6 +43,10 @@ pylint-pytest = "^1.1.2"
 
 [tool.poetry.group.gen.dependencies]
 datamodel-code-generator = "^0.17.2"
+
+[tool.poetry.group.dev.dependencies]
+# Add direct dependency only for development.
+betterproto = {git = "https://github.com/danielgtaylor/python-betterproto.git", rev = "master", extras = ["compiler"]}
 
 [build-system]
 requires = ["poetry-core"]
