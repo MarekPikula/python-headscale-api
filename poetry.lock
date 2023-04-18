@@ -72,9 +72,9 @@ compiler = ["black (>=19.3b0)", "isort (>=5.11.5,<6.0.0)", "jinja2 (>=3.0.3)"]
 
 [package.source]
 type = "git"
-url = "https://github.com/danielgtaylor/python-betterproto.git"
-reference = "master"
-resolved_reference = "2b41383745a89183c432251f09a472d56611f21b"
+url = "https://github.com/MarekPikula/python-betterproto.git"
+reference = "classmethod_from_dict"
+resolved_reference = "d7929e9b302697d28cf661f9182f80d201facb18"
 
 [[package]]
 name = "black"
@@ -537,14 +537,14 @@ files = [
 
 [[package]]
 name = "importlib-metadata"
-version = "6.4.1"
+version = "6.5.0"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "importlib_metadata-6.4.1-py3-none-any.whl", hash = "sha256:63ace321e24167d12fbb176b6015f4dbe06868c54a2af4f15849586afb9027fd"},
-    {file = "importlib_metadata-6.4.1.tar.gz", hash = "sha256:eb1a7933041f0f85c94cd130258df3fb0dec060ad8c1c9318892ef4192c47ce1"},
+    {file = "importlib_metadata-6.5.0-py3-none-any.whl", hash = "sha256:03ba783c3a2c69d751b109fc0c94a62c51f581b3d6acf8ed1331b6d5729321ff"},
+    {file = "importlib_metadata-6.5.0.tar.gz", hash = "sha256:7a8bdf1bc3a726297f5cfbc999e6e7ff6b4fa41b26bba4afc580448624460045"},
 ]
 
 [package.dependencies]
@@ -1717,4 +1717,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"  # TODO: Change to 3.7 once datetime parsing is fixed.
-content-hash = "b13bb3e2d021180b57d2e7a192e1e3586fc7e8a90b5089ddc232efb4868ad090"
+content-hash = "ac7aa7985582f7c0fc96273658819d8733f9024c407aeff29fc8b656a2f15658"

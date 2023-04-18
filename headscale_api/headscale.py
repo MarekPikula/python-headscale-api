@@ -5,11 +5,10 @@ __authors__ = ["Marek Pikuła <marek@serenitycode.dev>"]
 import logging
 from dataclasses import dataclass
 from json import JSONDecodeError
-from typing import Any, Dict, Generator, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Mapping, Optional, Type, TypeVar, Union
 
 import requests
 from betterproto import Message
-from betterproto.casing import safe_snake_case
 
 from .endpoints import ENDPOINTS, Endpoint
 from .schema.headscale import v1 as model
@@ -111,29 +110,6 @@ class Headscale(model.HeadscaleServiceStub):
         """
         return requests.get(self.health_url, timeout=self.timeout).status_code == 200
 
-    def _safe_snake_case_recursive(
-        self, dictionary: Dict[str, Any]
-    ) -> Generator[Tuple[str, Any], None, None]:
-        assert isinstance(dictionary, dict)
-        for key, value in dictionary.items():
-            escaped_key = safe_snake_case(key)
-            if isinstance(value, dict):
-                yield (
-                    escaped_key,
-                    dict(self._safe_snake_case_recursive(value)),  # type: ignore
-                )
-            elif isinstance(value, list):
-                yield escaped_key, list(
-                    list_value
-                    if not isinstance(list_value, dict)
-                    else dict(
-                        self._safe_snake_case_recursive(list_value)  # type: ignore
-                    )
-                    for list_value in value  # type: ignore
-                )
-            else:
-                yield escaped_key, value
-
     async def _unary_unary(  # type: ignore
         self,
         route: str,
@@ -190,18 +166,19 @@ class Headscale(model.HeadscaleServiceStub):
                 ) from error
 
         try:
-            response_dict = dict(self._safe_snake_case_recursive(response.json()))
-            response_parsed = response_type(**response_dict)  # type: ignore
+            response_parsed: MessageT = response_type.from_dict(  # type: ignore
+                response.json()
+            )
         except (JSONDecodeError, AssertionError, ValueError) as error:
             raise ErrorResponse(response.status_code, error_message(), []) from error
 
         if endpoint.logger_success_message is not None:
             self._logger.info(
                 endpoint.logger_success_message.format_map(
-                    dict(request_dict, **response_dict)
+                    dict(request_dict, **response_parsed.to_dict())  # type: ignore
                 )
             )
-        return response_parsed
+        return response_parsed  # type: ignore
 
     async def _unary_stream(  # type: ignore
         self,

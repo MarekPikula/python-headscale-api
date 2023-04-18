@@ -46,7 +46,7 @@ datamodel-code-generator = "^0.17.2"
 
 [tool.poetry.group.dev.dependencies]
 # Add direct dependency only for development.
-betterproto = {git = "https://github.com/danielgtaylor/python-betterproto.git", rev = "master", extras = ["compiler"]}
+betterproto = {git = "https://github.com/MarekPikula/python-betterproto.git", rev = "classmethod_from_dict", extras = ["compiler"]}
 
 [build-system]
 requires = ["poetry-core"]
