@@ -2,10 +2,11 @@
 
 __authors__ = ["Marek Pikuła <marek@serenitycode.dev>"]
 
+import json
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from json import JSONDecodeError
-from typing import Any, Dict, List, Mapping, Optional, Type, TypeVar, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 import requests
 from betterproto import Message
@@ -13,17 +14,54 @@ from betterproto import Message
 from .endpoints import ENDPOINTS, Endpoint
 from .schema.headscale import v1 as model
 
+Response = Tuple[str, int]
+"""Response in form acceptable by Flask.
+
+`(response: str, status: int)`
+"""
+
 
 @dataclass
-class ErrorResponse(RuntimeError):
+class ResponseError(RuntimeError):
     """Error response from Headscale."""
 
-    code: int
+    http_code: int
+    """HTTP code of error."""
+
+    code: Optional[int]
+    """Error code from server."""
+
     message: str
+    """Error message."""
+
     details: List[str]
+    """Error details."""
 
     def __str__(self) -> str:  # noqa
         return f"Response (code {self.code}): {self.message}"
+
+    def to_reponse(self) -> Response:
+        """Make a Flask-compatible error response."""
+        return json.dumps(asdict(self)), self.http_code
+
+    def raise_or_respond(
+        self, raise_exception: bool, source_exception: Optional[BaseException] = None
+    ) -> "Response":
+        """Raise exception or gracefully return response.
+
+        Arguments:
+            raise_exception -- raise exception instead of gracefully returning.
+            source_exception -- exception which triggered this error.
+
+        Raises:
+            ResponseError: if `raise_exception` is set.
+
+        Returns:
+            Flask-compatible response if `raise_exception` is False.
+        """
+        if raise_exception:
+            raise self from source_exception
+        return self.to_reponse()
 
 
 MessageT = TypeVar("MessageT", bound=Message)
@@ -38,6 +76,7 @@ class Headscale(model.HeadscaleServiceStub):
         base_url: str,
         api_key: Optional[str] = None,
         requests_timeout: float = 10,
+        raise_exception_on_error: bool = True,
         logger: Union[logging.Logger, int] = logging.INFO,
     ):
         """Initialize Headscale API.
@@ -48,12 +87,16 @@ class Headscale(model.HeadscaleServiceStub):
         Keyword Arguments:
             api_key -- API key, which can be overriden later (default: {None})
             requests_timeout -- request timeout in seconds (default: {10})
+            raise_exception_on_error -- raise exception in error (eiher internal or from
+                the API). Otherwise, return Flask-compatible response tuple
+                (default: {True})
             logger -- logger to use or default logging level
                 (default: {logging.INFO})
         """
         self._base_url = base_url
         self._api_key = api_key
         self.timeout = requests_timeout
+        self.raise_exception_on_error = raise_exception_on_error
         if isinstance(logger, logging.Logger):
             self._logger = logger
         else:
@@ -119,7 +162,7 @@ class Headscale(model.HeadscaleServiceStub):
         timeout: Optional[Any] = None,
         deadline: Optional[Any] = None,
         metadata: Optional[Any] = None,
-    ) -> MessageT:
+    ) -> Union[MessageT, Response]:
         """Execute an unary operation on the API.
 
         Used by HeadscaleServiceStub functions.
@@ -159,18 +202,22 @@ class Headscale(model.HeadscaleServiceStub):
         if response.status_code != 200:
             error_message()
             try:
-                raise ErrorResponse(**response.json())
+                return ResponseError(
+                    http_code=response.status_code, **response.json()
+                ).raise_or_respond(self.raise_exception_on_error)
             except JSONDecodeError as error:
-                raise ErrorResponse(
-                    response.status_code, response.content.decode(), []
-                ) from error
+                return ResponseError(
+                    response.status_code, None, response.content.decode(), []
+                ).raise_or_respond(self.raise_exception_on_error, error)
 
         try:
             response_parsed: MessageT = response_type.from_dict(  # type: ignore
                 response.json()
             )
         except (JSONDecodeError, AssertionError, ValueError) as error:
-            raise ErrorResponse(response.status_code, error_message(), []) from error
+            return ResponseError(500, 0, error_message(), []).raise_or_respond(
+                self.raise_exception_on_error, error
+            )
 
         if endpoint.logger_success_message is not None:
             self._logger.info(
