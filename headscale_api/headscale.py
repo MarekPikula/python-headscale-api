@@ -71,7 +71,7 @@ MessageT = TypeVar("MessageT", bound=Message)
 class Headscale(model.HeadscaleServiceStub):
     """Headscale API abstraction."""
 
-    def __init__(  # pylint: disable=super-init-not-called
+    def __init__(  # pylint: disable=super-init-not-called,too-many-arguments
         self,
         base_url: str,
         api_key: Optional[str] = None,
