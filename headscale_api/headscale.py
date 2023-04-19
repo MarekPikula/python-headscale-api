@@ -240,7 +240,8 @@ class Headscale(model.HeadscaleServiceStub):
         async with self.session as session, session.request(
             endpoint.request_type,
             api_url,
-            params=request_dict,
+            params=request_dict if endpoint.request_type == "GET" else None,
+            json=request_dict if endpoint.request_type != "GET" else None,
             headers={
                 "Accept": "application/json",
                 "Authorization": f"Bearer {self.api_key}",
