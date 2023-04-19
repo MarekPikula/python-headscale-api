@@ -288,7 +288,9 @@ class Machine(betterproto.Message):
     name: str = betterproto.string_field(6)
     user: "User" = betterproto.message_field(7)
     last_seen: datetime = betterproto.message_field(8)
-    last_successful_update: datetime = betterproto.message_field(9)
+    last_successful_update: Optional[datetime] = betterproto.message_field(
+        9, optional=True, group="_last_successful_update"
+    )
     expiry: datetime = betterproto.message_field(10)
     pre_auth_key: Optional["PreAuthKey"] = betterproto.message_field(
         11, optional=True, group="_pre_auth_key"
