@@ -65,6 +65,10 @@ class ResponseError(RuntimeError):
         return self.to_reponse()
 
 
+class UnauthorizedError(PermissionError):
+    """The request resulted in unauthorized error response."""
+
+
 MessageT = TypeVar("MessageT", bound=Message)
 """Message type for Headscale._unary_unary() function."""
 
@@ -109,6 +113,7 @@ class Headscale(model.HeadscaleServiceStub):
         api_key: Optional[str] = None,
         requests_timeout: float = 10,
         raise_exception_on_error: bool = True,
+        raise_unauthorized_error: bool = True,
         logger: Union[logging.Logger, int] = logging.INFO,
     ):
         """Initialize Headscale API.
@@ -122,6 +127,9 @@ class Headscale(model.HeadscaleServiceStub):
             raise_exception_on_error -- raise exception in error (eiher internal or from
                 the API). Otherwise, return Flask-compatible response tuple
                 (default: {True})
+            raise_unauthorized_error -- raise spectial UnauthorizedError exception on
+                unauthorized status. If False falls back to `raise_exception_on_error`
+                behaviour (default: {True})
             logger -- logger to use or default logging level
                 (default: {logging.INFO})
         """
@@ -129,6 +137,7 @@ class Headscale(model.HeadscaleServiceStub):
         self._api_key = api_key
         self.timeout = requests_timeout
         self.raise_exception_on_error = raise_exception_on_error
+        self.raise_unauthorized_error = raise_unauthorized_error
         self.logger = logger
         self._session = self._SessionContext(self)
 
@@ -260,11 +269,20 @@ class Headscale(model.HeadscaleServiceStub):
 
             if response.status != 200:
                 error_message()
+                # Unauthorized error special handling.
+                if (
+                    self.raise_unauthorized_error
+                    and (await response.read()).decode() == "Unauthorized"
+                ):
+                    raise UnauthorizedError()
+
                 try:
+                    # Try to parse the response as JSON.
                     return ResponseError(
                         http_code=response.status, **(await response.json())
                     ).raise_or_respond(self.raise_exception_on_error)
                 except JSONDecodeError as error:
+                    # Otherwise return as is.
                     return ResponseError(
                         response.status, None, (await response.read()).decode(), []
                     ).raise_or_respond(self.raise_exception_on_error, error)

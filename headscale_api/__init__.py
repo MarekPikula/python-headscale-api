@@ -7,18 +7,22 @@ if __name__ == "__main__":
     import asyncio
     import os
 
+    from .headscale import UnauthorizedError
     from .schema.headscale.v1 import GetUserRequest, ListApiKeysRequest
 
     async def main(index: int, headscale: Headscale):
         """Run some basic API test."""
-        async with headscale.session:
-            if not await headscale.health_check():
-                print("Not healthy!")
-                return
+        try:
+            async with headscale.session:
+                if not await headscale.health_check():
+                    print("Not healthy!")
+                    return
 
-            print(f"{index}: Server healthy!")
-            print(f"{index}: {await headscale.get_user(GetUserRequest('marek'))}")
-            print(f"{index}: {await headscale.list_api_keys(ListApiKeysRequest())}")
+                print(f"{index}: Server healthy!")
+                print(f"{index}: {await headscale.get_user(GetUserRequest('marek'))}")
+                print(f"{index}: {await headscale.list_api_keys(ListApiKeysRequest())}")
+        except UnauthorizedError:
+            print("Unauthorized. Check API key.")
 
     async def multi_main():
         """Test concurrent connections with a single session."""
