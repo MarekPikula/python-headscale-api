@@ -6,9 +6,10 @@ import json
 import logging
 from dataclasses import asdict, dataclass
 from json import JSONDecodeError
+from threading import Lock
 from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
-import requests
+import aiohttp
 from betterproto import Message
 
 from .endpoints import ENDPOINTS, Endpoint
@@ -71,6 +72,37 @@ MessageT = TypeVar("MessageT", bound=Message)
 class Headscale(model.HeadscaleServiceStub):
     """Headscale API abstraction."""
 
+    class _SessionContext:
+        """ClientSession context with session user counter."""
+
+        def __init__(self, parent: "Headscale") -> None:
+            self._session_lock = Lock()
+            self._session: Optional[aiohttp.ClientSession] = None
+            self._session_users = 0
+            self._parent = parent
+
+        async def __aenter__(self):
+            """Enter Headscale API session context.
+
+            If needed creates an `aiohttp.ClientSession`.
+            """
+            with self._session_lock:
+                if self._session_users == 0 or self._session is None:
+                    self._session = aiohttp.ClientSession(self._parent.base_url)
+                self._session_users += 1
+            return self._session
+
+        async def __aexit__(self, *err: Any):
+            """Exit Headscale API session context.
+
+            If session is not used by any context, the session is closed and removed.
+            """
+            with self._session_lock:
+                self._session_users -= 1
+                if self._session_users == 0 and self._session is not None:
+                    await self._session.close()
+                    self._session = None
+
     def __init__(  # pylint: disable=super-init-not-called,too-many-arguments
         self,
         base_url: str,
@@ -103,6 +135,24 @@ class Headscale(model.HeadscaleServiceStub):
             logging.basicConfig(level=logger)
             self._logger = logging.getLogger(__name__)
 
+        # Session persistance.
+        self._session = self._SessionContext(self)
+
+    @property
+    def session(self):
+        """Get session context (async).
+
+        Can be used to ensure persistent HTTP session with the API for subsequent
+        requests, e.g.:
+
+        ```
+        async with headscale.session:
+            await headscale.health_check()
+            await headscale.test_api_key()
+        ```
+        """
+        return self._session
+
     @property
     def api_key(self) -> Optional[str]:
         """Get API key if saved.
@@ -126,32 +176,31 @@ class Headscale(model.HeadscaleServiceStub):
         """
         if new_api_key is None:
             new_api_key = self.api_key
-        response = requests.get(
-            f"{self._base_url}/api/v1/apikey",
+
+        async with self.session as session, session.get(
+            "/api/v1/apikey",
             headers={
                 "Accept": "application/json",
                 "Authorization": f"Bearer {new_api_key}",
             },
             timeout=self.timeout,
-        )
-        return response.status_code == 200
+        ) as response:
+            return response.status == 200
 
     @property
     def base_url(self):
         """Get base URL of the Headscale server."""
         return self._base_url
 
-    @property
-    def health_url(self) -> str:
-        """Get health check URL of the Headscale server."""
-        return f"{self.base_url}/health"
-
     async def health_check(self) -> bool:
         """Perform a health check.
 
         Returns True if check passed.
         """
-        return requests.get(self.health_url, timeout=self.timeout).status_code == 200
+        async with self.session as session, session.get(
+            "/health", timeout=self.timeout
+        ) as response:
+            return response.status == 200
 
     async def _unary_unary(  # type: ignore
         self,
@@ -179,53 +228,53 @@ class Headscale(model.HeadscaleServiceStub):
         self._logger.info(endpoint.logger_start_message.format_map(request_dict))
 
         api_url = endpoint.api_url.format_map(request_dict)
-        response = requests.request(
+        async with self.session as session, session.request(
             endpoint.request_type,
-            f"{self._base_url}{api_url}",
+            api_url,
             params=request_dict,
             headers={
                 "Accept": "application/json",
                 "Authorization": f"Bearer {self.api_key}",
             },
             timeout=self.timeout if timeout is None else timeout,
-        )
+        ) as response:
 
-        def error_message():
-            message = (
-                endpoint.logger_fail_message.format_map(request_dict)
-                if endpoint.logger_fail_message is not None
-                else f'Request to "{api_url}" failed.'
-            ) + f" ({response.status_code})"  # type: ignore
-            self._logger.error(message)
-            return message
+            def error_message():
+                message = (
+                    endpoint.logger_fail_message.format_map(request_dict)
+                    if endpoint.logger_fail_message is not None
+                    else f'Request to "{api_url}" failed.'
+                ) + f" ({response.status})"
+                self._logger.error(message)
+                return message
 
-        if response.status_code != 200:
-            error_message()
+            if response.status != 200:
+                error_message()
+                try:
+                    return ResponseError(
+                        http_code=response.status, **(await response.json())
+                    ).raise_or_respond(self.raise_exception_on_error)
+                except JSONDecodeError as error:
+                    return ResponseError(
+                        response.status, None, (await response.read()).decode(), []
+                    ).raise_or_respond(self.raise_exception_on_error, error)
+
             try:
-                return ResponseError(
-                    http_code=response.status_code, **response.json()
-                ).raise_or_respond(self.raise_exception_on_error)
-            except JSONDecodeError as error:
-                return ResponseError(
-                    response.status_code, None, response.content.decode(), []
-                ).raise_or_respond(self.raise_exception_on_error, error)
-
-        try:
-            response_parsed: MessageT = response_type.from_dict(  # type: ignore
-                response.json()
-            )
-        except (JSONDecodeError, AssertionError, ValueError) as error:
-            return ResponseError(500, 0, error_message(), []).raise_or_respond(
-                self.raise_exception_on_error, error
-            )
-
-        if endpoint.logger_success_message is not None:
-            self._logger.info(
-                endpoint.logger_success_message.format_map(
-                    dict(request_dict, **response_parsed.to_dict())  # type: ignore
+                response_parsed: MessageT = response_type.from_dict(  # type: ignore
+                    await response.json()
                 )
-            )
-        return response_parsed  # type: ignore
+            except (JSONDecodeError, AssertionError, ValueError) as error:
+                return ResponseError(500, 0, error_message(), []).raise_or_respond(
+                    self.raise_exception_on_error, error
+                )
+
+            if endpoint.logger_success_message is not None:
+                self._logger.info(
+                    endpoint.logger_success_message.format_map(
+                        dict(request_dict, **response_parsed.to_dict())  # type: ignore
+                    )
+                )
+            return response_parsed  # type: ignore
 
     async def _unary_stream(  # type: ignore
         self,

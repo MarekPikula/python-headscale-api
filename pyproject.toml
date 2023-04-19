@@ -20,9 +20,9 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.11"  # TODO: Change to 3.7 once datetime parsing is fixed.
 betterproto = {version = "2.0.0b5", extras = ["compiler"]} # TODO: Change after release.
-requests = "^2.28.2"
 pydantic = "^1.10.7"
 pydantic-yaml = {extras = ["ruamel"], version = "^0.11.2"}
+aiohttp = "^3.8.4"
 
 [tool.poetry.group.lint.dependencies]
 black = "^23.3.0"
@@ -31,7 +31,6 @@ isort = "^5.11"
 ruff = "^0.0.260"
 pydocstyle = "^6.3.0"
 pylint = "^2.13"
-types-requests = "^2.28.11.17"
 pylint-pydantic = "^0.1.8"
 
 [tool.poetry.group.test.dependencies]
