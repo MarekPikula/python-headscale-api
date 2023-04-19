@@ -129,14 +129,21 @@ class Headscale(model.HeadscaleServiceStub):
         self._api_key = api_key
         self.timeout = requests_timeout
         self.raise_exception_on_error = raise_exception_on_error
+        self.logger = logger
+        self._session = self._SessionContext(self)
+
+    @property
+    def logger(self):
+        """Get logger used by the API abstraction."""
+        return self._logger
+
+    @logger.setter
+    def logger(self, logger: Union[logging.Logger, int]):
         if isinstance(logger, logging.Logger):
             self._logger = logger
         else:
             logging.basicConfig(level=logger)
             self._logger = logging.getLogger(__name__)
-
-        # Session persistance.
-        self._session = self._SessionContext(self)
 
     @property
     def session(self):
