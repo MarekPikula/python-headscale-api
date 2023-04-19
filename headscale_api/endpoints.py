@@ -248,7 +248,7 @@ ENDPOINTS = {
         schema.DisableRouteRequest,
         schema.DisableRouteResponse,
         "POST",
-        "/api/v1/routes/{routeId}/enable",
+        "/api/v1/routes/{routeId}/disable",
         'Disabling route "{routeId}".',
     ),
     "/headscale.v1.HeadscaleService/GetMachineRoutes": Endpoint(
