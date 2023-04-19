@@ -231,7 +231,9 @@ class Headscale(model.HeadscaleServiceStub):
                 f'Route "{error.args[0]}" not supported. Contact the module maintainer.'
             ) from error
 
-        request_dict: Dict[str, Any] = request.to_dict()  # type: ignore
+        request_dict: Dict[str, Any] = request.to_dict(  # type: ignore
+            include_default_values=True
+        )
         self._logger.info(endpoint.logger_start_message.format_map(request_dict))
 
         api_url = endpoint.api_url.format_map(request_dict)
