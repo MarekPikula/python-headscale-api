@@ -39,51 +39,6 @@ class RegisterMethod(betterproto.Enum):
 
 
 @dataclass(eq=False, repr=False)
-class ApiKey(betterproto.Message):
-    id: int = betterproto.uint64_field(1)
-    prefix: str = betterproto.string_field(2)
-    expiration: datetime = betterproto.message_field(3)
-    created_at: datetime = betterproto.message_field(4)
-    last_seen: Optional[datetime] = betterproto.message_field(
-        5, optional=True, group="_last_seen"
-    )
-
-    @root_validator()
-    def check_oneof(cls, values):
-        return cls._validate_field_groups(values)
-
-
-@dataclass(eq=False, repr=False)
-class CreateApiKeyRequest(betterproto.Message):
-    expiration: datetime = betterproto.message_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class CreateApiKeyResponse(betterproto.Message):
-    api_key: str = betterproto.string_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class ExpireApiKeyRequest(betterproto.Message):
-    prefix: str = betterproto.string_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class ExpireApiKeyResponse(betterproto.Message):
-    pass
-
-
-@dataclass(eq=False, repr=False)
-class ListApiKeysRequest(betterproto.Message):
-    pass
-
-
-@dataclass(eq=False, repr=False)
-class ListApiKeysResponse(betterproto.Message):
-    api_keys: List["ApiKey"] = betterproto.message_field(1)
-
-
-@dataclass(eq=False, repr=False)
 class Latency(betterproto.Message):
     latency_ms: float = betterproto.float_field(1)
     preferred: bool = betterproto.bool_field(2)
@@ -472,6 +427,51 @@ class DeleteRouteRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class DeleteRouteResponse(betterproto.Message):
     pass
+
+
+@dataclass(eq=False, repr=False)
+class ApiKey(betterproto.Message):
+    id: int = betterproto.uint64_field(1)
+    prefix: str = betterproto.string_field(2)
+    expiration: datetime = betterproto.message_field(3)
+    created_at: datetime = betterproto.message_field(4)
+    last_seen: Optional[datetime] = betterproto.message_field(
+        5, optional=True, group="_last_seen"
+    )
+
+    @root_validator()
+    def check_oneof(cls, values):
+        return cls._validate_field_groups(values)
+
+
+@dataclass(eq=False, repr=False)
+class CreateApiKeyRequest(betterproto.Message):
+    expiration: datetime = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class CreateApiKeyResponse(betterproto.Message):
+    api_key: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class ExpireApiKeyRequest(betterproto.Message):
+    prefix: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class ExpireApiKeyResponse(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class ListApiKeysRequest(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class ListApiKeysResponse(betterproto.Message):
+    api_keys: List["ApiKey"] = betterproto.message_field(1)
 
 
 class HeadscaleServiceStub(betterproto.ServiceStub):
@@ -1362,9 +1362,6 @@ class HeadscaleServiceBase(ServiceBase):
         }
 
 
-ApiKey.__pydantic_model__.update_forward_refs()  # type: ignore
-CreateApiKeyRequest.__pydantic_model__.update_forward_refs()  # type: ignore
-ListApiKeysResponse.__pydantic_model__.update_forward_refs()  # type: ignore
 ClientConnectivity.__pydantic_model__.update_forward_refs()  # type: ignore
 GetDeviceResponse.__pydantic_model__.update_forward_refs()  # type: ignore
 User.__pydantic_model__.update_forward_refs()  # type: ignore
@@ -1388,3 +1385,6 @@ DebugCreateMachineResponse.__pydantic_model__.update_forward_refs()  # type: ign
 Route.__pydantic_model__.update_forward_refs()  # type: ignore
 GetRoutesResponse.__pydantic_model__.update_forward_refs()  # type: ignore
 GetMachineRoutesResponse.__pydantic_model__.update_forward_refs()  # type: ignore
+ApiKey.__pydantic_model__.update_forward_refs()  # type: ignore
+CreateApiKeyRequest.__pydantic_model__.update_forward_refs()  # type: ignore
+ListApiKeysResponse.__pydantic_model__.update_forward_refs()  # type: ignore
