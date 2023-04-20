@@ -73,7 +73,9 @@ MessageT = TypeVar("MessageT", bound=Message)
 """Message type for Headscale._unary_unary() function."""
 
 
-class Headscale(model.HeadscaleServiceStub):
+class Headscale(
+    model.HeadscaleServiceStub
+):  # pylint: disable=too-many-instance-attributes
     """Headscale API abstraction."""
 
     class _SessionContext:
@@ -252,8 +254,8 @@ class Headscale(model.HeadscaleServiceStub):
         response_type: Type[MessageT],
         *,
         timeout: Optional[Any] = None,
-        deadline: Optional[Any] = None,
-        metadata: Optional[Any] = None,
+        deadline: Optional[Any] = None,  # pylint: disable=unused-argument
+        metadata: Optional[Any] = None,  # pylint: disable=unused-argument
     ) -> Union[MessageT, Response]:
         """Execute an unary operation on the API.
 
