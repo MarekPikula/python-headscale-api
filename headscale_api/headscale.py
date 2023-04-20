@@ -238,7 +238,7 @@ class Headscale(
         renewal_threshold: timedelta = timedelta(days=5),
         new_expiration: timedelta = timedelta(days=90),
         expire_previous_key: bool = True,
-    ) -> model.ApiKey | None:
+    ) -> model.ApiKey | str | None:
         """Renew an API key if needed.
 
         If it does, renew the key and expire the old key.
@@ -254,9 +254,8 @@ class Headscale(
                 (default: {True})
 
         Returns:
-            API key information about the current valid key. Can be either the checked
-            key if it doesn't need renewal or the new key if it has been renewed. None
-            if the source key doesn't exist or new key test has failed.
+            API key information about the current valid key, new key or None if the
+            source key doesn't exist or new key test has failed.
         """
         key_info = await self.get_api_key_info(key_to_renew)
         if key_info is None:
@@ -296,7 +295,7 @@ class Headscale(
             await self.expire_api_key(model.ExpireApiKeyRequest(key_info.prefix))
             self.logger.info("Previous key expired.")
 
-        return key_info
+        return new_key.api_key
 
     @property
     def base_url(self):
