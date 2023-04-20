@@ -203,6 +203,33 @@ class Headscale(model.HeadscaleServiceStub):
         ) as response:
             return response.status == 200
 
+    async def get_api_key_info(self, api_key: str | None = None) -> model.ApiKey | None:
+        """Get information about an API key.
+
+        Keyword Arguments:
+            api_key -- API key to get information about. Use current API key if None.
+                Can be an API key prefix (default: {None})
+
+        Returns:
+            API key model if found. None otherwise.
+        """
+        if api_key is None:
+            api_key = self.api_key
+            if api_key is None:
+                return None
+        if len(api_key) < 11:
+            raise ValueError("API key too short.")
+
+        api_key = api_key[0:10]
+        self._logger.debug("Looking for an API Key with prefix %s...", api_key)
+        for key in (await self.list_api_keys(model.ListApiKeysRequest())).api_keys:
+            if api_key == key.prefix:
+                self._logger.debug("Key with prefix %s found.", api_key)
+                return key
+
+        self._logger.debug("Key with prefix %s not found.", api_key)
+        return None
+
     @property
     def base_url(self):
         """Get base URL of the Headscale server."""
