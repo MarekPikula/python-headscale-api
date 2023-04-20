@@ -220,14 +220,14 @@ class Headscale(model.HeadscaleServiceStub):
         if len(api_key) < 11:
             raise ValueError("API key too short.")
 
-        api_key = api_key[0:10]
-        self._logger.debug("Looking for an API Key with prefix %s...", api_key)
+        api_key = api_key[:10]
+        self.logger.debug("Looking for an API Key with prefix %s...", api_key)
         for key in (await self.list_api_keys(model.ListApiKeysRequest())).api_keys:
             if api_key == key.prefix:
-                self._logger.debug("Key with prefix %s found.", api_key)
+                self.logger.debug("Key with prefix %s found.", api_key)
                 return key
 
-        self._logger.debug("Key with prefix %s not found.", api_key)
+        self.logger.debug("Key with prefix %s not found.", api_key)
         return None
 
     @property
@@ -270,7 +270,7 @@ class Headscale(model.HeadscaleServiceStub):
         request_dict: Dict[str, Any] = request.to_dict(  # type: ignore
             include_default_values=True
         )
-        self._logger.info(endpoint.logger_start_message.format_map(request_dict))
+        self.logger.info(endpoint.logger_start_message.format_map(request_dict))
 
         api_url = endpoint.api_url.format_map(request_dict)
         async with self.session as session, session.request(
@@ -291,7 +291,7 @@ class Headscale(model.HeadscaleServiceStub):
                     if endpoint.logger_fail_message is not None
                     else f'Request to "{api_url}" failed.'
                 ) + f" ({response.status})"
-                self._logger.error(message)
+                self.logger.error(message)
                 return message
 
             if response.status != 200:
@@ -324,7 +324,7 @@ class Headscale(model.HeadscaleServiceStub):
                 )
 
             if endpoint.logger_success_message is not None:
-                self._logger.info(
+                self.logger.info(
                     endpoint.logger_success_message.format_map(
                         dict(request_dict, **response_parsed.to_dict())  # type: ignore
                     )
