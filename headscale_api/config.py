@@ -1,4 +1,4 @@
-"""Headscale config abstration."""
+"""Headscale config abstraction."""
 
 from pydantic_yaml import YamlModelMixin
 

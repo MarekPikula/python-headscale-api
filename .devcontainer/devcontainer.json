@@ -35,7 +35,8 @@
 				"njpwerner.autodocstring",
 				"pbkit.vscode-pbkit",
 				"redhat.vscode-yaml",
-				"ryanluker.vscode-coverage-gutters"
+				"ryanluker.vscode-coverage-gutters",
+				"streetsidesoftware.code-spell-checker"
 			],
 			"settings": {
 				"python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",

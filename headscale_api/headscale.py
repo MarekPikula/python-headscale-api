@@ -41,7 +41,7 @@ class ResponseError(RuntimeError):
     def __str__(self) -> str:  # noqa
         return f"Response (code {self.code}): {self.message}"
 
-    def to_reponse(self) -> Response:
+    def to_response(self) -> Response:
         """Make a Flask-compatible error response."""
         return json.dumps(asdict(self)), self.http_code
 
@@ -62,7 +62,7 @@ class ResponseError(RuntimeError):
         """
         if raise_exception:
             raise self from source_exception
-        return self.to_reponse()
+        return self.to_response()
 
 
 class UnauthorizedError(PermissionError):
@@ -124,12 +124,12 @@ class Headscale(
             base_url -- base API URL (without `/api/v1`).
 
         Keyword Arguments:
-            api_key -- API key, which can be overriden later (default: {None})
+            api_key -- API key, which can be overridden later (default: {None})
             requests_timeout -- request timeout in seconds (default: {10})
-            raise_exception_on_error -- raise exception in error (eiher internal or from
-                the API). Otherwise, return Flask-compatible response tuple
+            raise_exception_on_error -- raise exception in error (either internal or
+                from the API). Otherwise, return Flask-compatible response tuple
                 (default: {True})
-            raise_unauthorized_error -- raise spectial UnauthorizedError exception on
+            raise_unauthorized_error -- raise a special UnauthorizedError exception on
                 unauthorized status. If False falls back to `raise_exception_on_error`
                 behaviour (default: {True})
             logger -- logger to use or default logging level
@@ -175,7 +175,7 @@ class Headscale(
     def api_key(self) -> Optional[str]:
         """Get API key if saved.
 
-        Can be overriden in child class.
+        Can be overridden in child class.
         """
         return self._api_key
 
@@ -246,7 +246,7 @@ class Headscale(
         Keyword Arguments:
             key_to_renew -- key to renew. Can be key prefix (first 11 characters). If
                 None, renews the current key (default: {None})
-            renewal_threshold -- how much time before expiration sould the key be
+            renewal_threshold -- how much time before expiration should the key be
                 renewed (default: {timedelta(days=5)})
             new_expiration -- how long should the new key be valid
                 (default: {timedelta(days=90)})
