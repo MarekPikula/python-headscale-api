@@ -1,10 +1,10 @@
 """Headscale API abstraction."""
 
 __authors__ = ["Marek Pikuła <marek@serenitycode.dev>"]
-
 import json
 import logging
 from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta, timezone
 from json import JSONDecodeError
 from threading import Lock
 from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
@@ -231,6 +231,72 @@ class Headscale(
 
         self.logger.debug("Key with prefix %s not found.", api_key)
         return None
+
+    async def renew_api_key(
+        self,
+        key_to_renew: str | None = None,
+        renewal_threshold: timedelta = timedelta(days=5),
+        new_expiration: timedelta = timedelta(days=90),
+        expire_previous_key: bool = True,
+    ) -> model.ApiKey | None:
+        """Renew an API key if needed.
+
+        If it does, renew the key and expire the old key.
+
+        Keyword Arguments:
+            key_to_renew -- key to renew. Can be key prefix (first 11 characters). If
+                None, renews the current key (default: {None})
+            renewal_threshold -- how much time before expiration sould the key be
+                renewed (default: {timedelta(days=5)})
+            new_expiration -- how long should the new key be valid
+                (default: {timedelta(days=90)})
+            expire_previous_key -- expire the previous key after renewal
+                (default: {True})
+
+        Returns:
+            API key information about the current valid key. Can be either the checked
+            key if it doesn't need renewal or the new key if it has been renewed. None
+            if the source key doesn't exist or new key test has failed.
+        """
+        key_info = await self.get_api_key_info(key_to_renew)
+        if key_info is None:
+            self._logger.warning("Current key has not been found.")
+            return None
+
+        delta = key_info.expiration - datetime.now(timezone.utc)
+
+        if delta > renewal_threshold:
+            return key_info
+
+        self._logger.warning(
+            "Key is about to expire. Delta is %s. Renewing...", str(delta)
+        )
+        new_key = await self.create_api_key(
+            model.CreateApiKeyRequest(datetime.today() + new_expiration)
+        )
+        self._logger.info("Renewed API key prefix: %s", new_key.api_key[:10])
+
+        if not await self.test_api_key(new_key.api_key):
+            self._logger.error("API key test failed.")
+            return None
+
+        if key_to_renew is None:
+            self._logger.info("The new key is valid. Saving to configuration.")
+            try:
+                self.api_key = new_key.api_key
+            except Exception as error:  # pylint: disable=broad-exception-caught
+                # We want to be extra sure that the new key has been stored. Since
+                # `api_key` is a property, its behaviour might be changed in children
+                # class and thus there is an option that it will raise an exception.
+                self.logger.error("Failed to save the new key: %s", error)
+                return None
+
+        if expire_previous_key:
+            self.logger.debug("Expiring the previous key.")
+            await self.expire_api_key(model.ExpireApiKeyRequest(key_info.prefix))
+            self.logger.info("Previous key expired.")
+
+        return key_info
 
     @property
     def base_url(self):
