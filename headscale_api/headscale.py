@@ -6,7 +6,7 @@ import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from json import JSONDecodeError
-from threading import Lock
+from multiprocessing import Lock
 from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 import aiohttp
